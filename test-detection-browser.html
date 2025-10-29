@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Detection Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    h1 { color: #4ade80; }
+    h2 { color: #60a5fa; margin-top: 30px; }
+    h3 { color: #a78bfa; }
+    .test-case {
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .passed { color: #4ade80; }
+    .failed { color: #f87171; }
+    .warning { color: #fbbf24; }
+    .char-detail {
+      font-family: monospace;
+      font-size: 12px;
+      color: #999;
+      margin-left: 20px;
+    }
+    .summary {
+      background: #333;
+      border-left: 4px solid #4ade80;
+      padding: 15px;
+      margin: 30px 0;
+    }
+    .controls {
+      margin: 20px 0;
+      padding: 15px;
+      background: #2a2a2a;
+      border-radius: 8px;
+    }
+    button {
+      background: #4ade80;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #22c55e;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    .progress {
+      background: #444;
+      height: 20px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    .progress-bar {
+      background: #4ade80;
+      height: 100%;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Font Detection Validation Test</h1>
+  
+  <div class="controls">
+    <p>Upload the test fonts from: <code>C:\Users\dstankovic\Sites\font-audit\test-fonts\</code></p>
+    <input type="file" id="fontInput" multiple accept=".woff2" />
+    <button onclick="runTests()" style="margin-left: 10px;">Run Tests</button>
+  </div>
+  
+  <div id="progress" style="display: none;">
+    <div class="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="progressText">Running tests...</p>
+  </div>
+  
+  <div id="results"></div>
+
+  <script>
+    // Test cases with expected missing glyphs
+    const TEST_CASES = {
+      'Array-Bold.woff2': {
+        'de': ['ẞ'],
+        'en': []
+      },
+      'Sharpie-Black.woff2': {
+        'de': ['ẞ'],
+        'en': []
+      },
+      'Styro-Bold.woff2': {
+        'de': ['ẞ', '.', ',', ';', ':', '!', '?', "'", '(', ')', '-', '–', '—'],
+        'en': ['.', ',', ';', ':', '!', '?', "'", '(', ')', '-', '–', '—', '/', '\\', '#', '%', '*', '+', '=']
+      }
+    };
+
+    // Language coverage sets
+    const LANGUAGES = {
+      'de': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÖÜßẞ0123456789.,;:!?\'()-–—/\\@#$%&*+=',
+      'en': 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:!?\'()-–—/\\@#$%&*+='
+    };
+
+    let uploadedFonts = new Map();
+
+    document.getElementById('fontInput').addEventListener('change', async (e) => {
+      uploadedFonts.clear();
+      
+      for (const file of e.target.files) {
+        const buffer = await file.arrayBuffer();
+        const fontName = file.name.replace('.woff2', '');
+        
+        try {
+          const fontFace = new FontFace(fontName, buffer);
+          await fontFace.load();
+          document.fonts.add(fontFace);
+          
+          uploadedFonts.set(file.name, { fontName, buffer });
+          console.log(`✅ Loaded font: ${fontName}`);
+        } catch (error) {
+          console.error(`❌ Failed to load ${file.name}:`, error);
+        }
+      }
+      
+      if (uploadedFonts.size > 0) {
+        alert(`Loaded ${uploadedFonts.size} fonts. Click "Run Tests" to start.`);
+      }
+    });
+
+    function detectMissingGlyph(canvas, ctx, character, fontName) {
+      const FONT_SIZE = 48;
+      const TEXT_X = 10;
+      const TEXT_Y = 60;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Render with test font
+      ctx.font = `${FONT_SIZE}px "${fontName}", sans-serif`;
+      const testWidth = ctx.measureText(character).width;
+      
+      // Render with fallback
+      ctx.font = `${FONT_SIZE}px sans-serif`;
+      const fallbackWidth = ctx.measureText(character).width;
+      
+      const widthDiff = Math.abs(testWidth - fallbackWidth);
+      
+      // Decision logic (same as in detect.ts)
+      let isMissing = false;
+      let confidence = 0.5;
+      
+      if (widthDiff > 1.0) {
+        isMissing = false;
+        confidence = 0.95;
+      } else if (widthDiff < 0.1) {
+        isMissing = true;
+        confidence = 0.9;
+      } else {
+        isMissing = false;
+        confidence = 0.6;
+      }
+      
+      return {
+        character,
+        isMissing,
+        confidence,
+        testWidth,
+        fallbackWidth,
+        widthDiff
+      };
+    }
+
+    async function runTests() {
+      if (uploadedFonts.size === 0) {
+        alert('Please upload fonts first!');
+        return;
+      }
+      
+      const resultsDiv = document.getElementById('results');
+      const progressDiv = document.getElementById('progress');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+      
+      resultsDiv.innerHTML = '';
+      progressDiv.style.display = 'block';
+      
+      const canvas = document.createElement('canvas');
+      canvas.width = 100;
+      canvas.height = 100;
+      const ctx = canvas.getContext('2d');
+      
+      let totalTests = 0;
+      let passedTests = 0;
+      let failedTests = 0;
+      const failures = [];
+      
+      let html = '<h2>Test Results</h2>';
+      
+      let currentTest = 0;
+      let totalTestCount = 0;
+      
+      // Calculate total tests
+      for (const [fontFile, languageTests] of Object.entries(TEST_CASES)) {
+        if (!uploadedFonts.has(fontFile)) continue;
+        for (const [langCode] of Object.entries(languageTests)) {
+          const coverage = LANGUAGES[langCode];
+          const characters = [...new Set(coverage.split(''))];
+          totalTestCount += characters.length;
+        }
+      }
+      
+      for (const [fontFile, languageTests] of Object.entries(TEST_CASES)) {
+        if (!uploadedFonts.has(fontFile)) {
+          html += `<div class="test-case">
+            <h3 class="warning">⚠️ ${fontFile}</h3>
+            <p>Font not uploaded - skipping tests</p>
+          </div>`;
+          continue;
+        }
+        
+        const { fontName } = uploadedFonts.get(fontFile);
+        
+        html += `<div class="test-case">
+          <h3>📝 ${fontFile}</h3>`;
+        
+        for (const [langCode, expectedMissing] of Object.entries(languageTests)) {
+          const coverage = LANGUAGES[langCode];
+          const characters = [...new Set(coverage.split(''))];
+          
+          const detectedMissing = [];
+          const falsePositives = [];
+          const falseNegatives = [];
+          
+          for (const char of characters) {
+            currentTest++;
+            totalTests++;
+            
+            const progress = (currentTest / totalTestCount) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `Testing ${fontFile} (${langCode.toUpperCase()}): ${currentTest}/${totalTestCount} characters...`;
+            
+            // Small delay to allow UI update
+            if (currentTest % 10 === 0) {
+              await new Promise(resolve => setTimeout(resolve, 0));
+            }
+            
+            const result = detectMissingGlyph(canvas, ctx, char, fontName);
+            
+            const shouldBeMissing = expectedMissing.includes(char);
+            const detectedAsMissing = result.isMissing;
+            
+            if (detectedAsMissing) {
+              detectedMissing.push(char);
+            }
+            
+            if (shouldBeMissing && detectedAsMissing) {
+              passedTests++;
+            } else if (!shouldBeMissing && !detectedAsMissing) {
+              passedTests++;
+            } else if (!shouldBeMissing && detectedAsMissing) {
+              falsePositives.push({ char, ...result });
+              failedTests++;
+            } else if (shouldBeMissing && !detectedAsMissing) {
+              falseNegatives.push({ char, ...result });
+              failedTests++;
+            }
+          }
+          
+          html += `<div style="margin: 15px 0;">
+            <h4>Language: ${langCode.toUpperCase()}</h4>
+            <p><strong>Expected missing:</strong> ${expectedMissing.length === 0 ? '<em>none</em>' : expectedMissing.join(' ')}</p>
+            <p><strong>Detected missing:</strong> ${detectedMissing.length === 0 ? '<em>none</em>' : detectedMissing.join(' ')}</p>`;
+          
+          if (falsePositives.length > 0) {
+            html += `<p class="failed">❌ False positives (${falsePositives.length}): ${falsePositives.map(f => f.char).join(' ')}</p>`;
+            falsePositives.forEach(fp => {
+              html += `<div class="char-detail">${fp.char}: test=${fp.testWidth.toFixed(2)}px, fallback=${fp.fallbackWidth.toFixed(2)}px, diff=${fp.widthDiff.toFixed(2)}px (detected as missing but should be present)</div>`;
+            });
+            failures.push({ font: fontFile, lang: langCode, type: 'false_positive', items: falsePositives });
+          }
+          
+          if (falseNegatives.length > 0) {
+            html += `<p class="failed">❌ False negatives (${falseNegatives.length}): ${falseNegatives.map(f => f.char).join(' ')}</p>`;
+            falseNegatives.forEach(fn => {
+              html += `<div class="char-detail">${fn.char}: test=${fn.testWidth.toFixed(2)}px, fallback=${fn.fallbackWidth.toFixed(2)}px, diff=${fn.widthDiff.toFixed(2)}px (detected as present but should be missing)</div>`;
+            });
+            failures.push({ font: fontFile, lang: langCode, type: 'false_negative', items: falseNegatives });
+          }
+          
+          if (falsePositives.length === 0 && falseNegatives.length === 0) {
+            html += `<p class="passed">✅ All tests passed for ${fontFile} (${langCode.toUpperCase()})</p>`;
+          }
+          
+          html += `</div>`;
+        }
+        
+        html += `</div>`;
+      }
+      
+      // Summary
+      const passRate = ((passedTests / totalTests) * 100).toFixed(1);
+      const failRate = ((failedTests / totalTests) * 100).toFixed(1);
+      
+      html += `<div class="summary">
+        <h2>📊 Test Summary</h2>
+        <p><strong>Total tests:</strong> ${totalTests}</p>
+        <p class="passed"><strong>Passed:</strong> ${passedTests} (${passRate}%)</p>
+        <p class="failed"><strong>Failed:</strong> ${failedTests} (${failRate}%)</p>
+      </div>`;
+      
+      if (failures.length > 0) {
+        html += `<div class="test-case" style="border-color: #f87171;">
+          <h3 class="failed">❌ FAILURES DETECTED - Detection algorithm needs adjustment</h3>
+          <h4>Recommendations:</h4>
+          <ul>
+            <li>If many false positives: increase width threshold (currently 1.0px)</li>
+            <li>If many false negatives: decrease width threshold or add bitmap comparison</li>
+            <li>Review the char-detail logs above to see the width differences</li>
+          </ul>
+        </div>`;
+      } else {
+        html += `<div class="test-case" style="border-color: #4ade80;">
+          <h3 class="passed">✅ ALL TESTS PASSED!</h3>
+          <p>Detection algorithm is working correctly for all test cases.</p>
+        </div>`;
+      }
+      
+      resultsDiv.innerHTML = html;
+      progressDiv.style.display = 'none';
+      
+      console.log('Test complete:', { totalTests, passedTests, failedTests, passRate, failures });
+    }
+  </script>
+</body>
+</html>
+
+

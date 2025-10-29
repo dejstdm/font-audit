@@ -1,0 +1,8 @@
+{
+  "id": "fr",
+  "name": "French",
+  "nativeName": "Français",
+  "rtl": false,
+  "sample": "Les naïfs ægithales hâtifs pondant à Noël où il gèle sont sûrs d'être déçus.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÆÇÉÈÊËÎÏÔŒÙÛÜŸabcdefghijklmnopqrstuvwxyzàâæçéèêëîïôœùûüÿ0123456789.,;:!?'()«»-–—"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "de",
+  "name": "German",
+  "nativeName": "Deutsch",
+  "rtl": false,
+  "sample": "Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜẞabcdefghijklmnopqrstuvwxyzäöüß0123456789.,;:!?'()-–—"
+}

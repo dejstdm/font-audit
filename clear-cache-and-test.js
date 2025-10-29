@@ -1,0 +1,38 @@
+/**
+ * Clear the detection cache and test the fixed detection
+ */
+
+console.log('🧹 Clearing Detection Cache')
+console.log('=' .repeat(40))
+console.log('')
+
+// Clear the cache by calling the function from the browser console
+console.log('Run this in the browser console:')
+console.log('')
+console.log('1. Open browser console (F12)')
+console.log('2. Run this command:')
+console.log('')
+console.log('   import { clearDetectionCache } from "./src/lib/detect.js"')
+console.log('   await clearDetectionCache()')
+console.log('')
+console.log('3. Then refresh the page')
+console.log('4. Go to Preview → Coverage Grid')
+console.log('5. Click "Re-run Detection"')
+console.log('')
+console.log('Expected Results:')
+console.log('- Should NOT use cached results')
+console.log('- Should run fresh detection with new thresholds')
+console.log('- Most characters should be PRESENT (no red borders)')
+console.log('- Check console for debug logs')
+console.log('')
+console.log('Debug logs to look for:')
+console.log('- "Width A: test=X, fallback=Y, diff=Z"')
+console.log('- "Debug A: testHash=X, fallbackHash=Y, hashDiff=Z"')
+console.log('- Should show width/hash differences')
+console.log('')
+console.log('If still all red after cache clear:')
+console.log('- The font might not be loading properly in worker')
+console.log('- Canvas rendering might have issues')
+console.log('- Fallback font might be different than expected')
+console.log('')
+console.log('=' .repeat(40))

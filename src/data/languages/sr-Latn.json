@@ -1,0 +1,8 @@
+{
+  "id": "sr-Latn",
+  "name": "Serbian (Latin)",
+  "nativeName": "Srpski (latinica)",
+  "rtl": false,
+  "sample": "Đurđevdan se slavi uz šarene vence i zvuke frule.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZČĆĐŠŽabcdefghijklmnopqrstuvwxyzčćđšž0123456789.,;:!?'()-–—"
+}

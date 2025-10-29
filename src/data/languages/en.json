@@ -1,0 +1,8 @@
+{
+  "id": "en",
+  "name": "English",
+  "nativeName": "English",
+  "rtl": false,
+  "sample": "The quick brown fox jumps over the lazy dog.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,;:!?'()-–—/\\@#$%&*+="
+}

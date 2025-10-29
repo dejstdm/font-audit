@@ -1,0 +1,46 @@
+[
+  {
+    "id": "eu-core",
+    "name": "EU Core",
+    "languages": [
+      "en",
+      "fr",
+      "de",
+      "es",
+      "sr-Latn",
+      "sr-Cyrl"
+    ]
+  },
+  {
+    "id": "mena",
+    "name": "MENA",
+    "languages": [
+      "ar",
+      "he",
+      "en"
+    ]
+  },
+  {
+    "id": "cjk-ui",
+    "name": "CJK UI",
+    "languages": [
+      "ja",
+      "zh-Hans",
+      "en"
+    ]
+  },
+  {
+    "id": "global",
+    "name": "Global Starter",
+    "languages": [
+      "en",
+      "es",
+      "fr",
+      "de",
+      "ar",
+      "he",
+      "ja",
+      "zh-Hans"
+    ]
+  }
+]

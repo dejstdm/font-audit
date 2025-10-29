@@ -1,0 +1,8 @@
+{
+  "id": "es",
+  "name": "Spanish",
+  "nativeName": "Español",
+  "rtl": false,
+  "sample": "El rápido zorro marrón salta sobre el perro perezoso.",
+  "coverage": "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚÜáéíóúü¿¡0123456789.,;:!?'()-–—"
+}
