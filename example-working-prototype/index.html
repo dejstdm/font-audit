@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>WOFF2 Font Info Viewer</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+            .container {
+                max-width: 900px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                overflow: hidden;
+            }
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 40px;
+                text-align: center;
+            }
+            .header h1 {
+                font-size: 2.5rem;
+                margin-bottom: 10px;
+                font-weight: 700;
+            }
+            .header p {
+                opacity: 0.9;
+                font-size: 1.1rem;
+            }
+            .content {
+                padding: 40px;
+            }
+            .format-support {
+                background: #f0f4ff;
+                border-left: 4px solid #667eea;
+                padding: 20px;
+                margin-bottom: 30px;
+                border-radius: 8px;
+            }
+            .format-support h3 {
+                color: #667eea;
+                margin-bottom: 15px;
+            }
+            .format-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 10px;
+                margin-top: 10px;
+            }
+            .format-item {
+                padding: 10px;
+                background: white;
+                border-radius: 6px;
+                text-align: center;
+                font-weight: 500;
+            }
+            .format-item.supported {
+                color: #22c55e;
+                border: 2px solid #22c55e;
+            }
+            .format-item.unsupported {
+                color: #ef4444;
+                border: 2px solid #ef4444;
+            }
+            .upload-area {
+                border: 3px dashed #ddd;
+                border-radius: 12px;
+                padding: 60px 40px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s;
+                background: #fafafa;
+            }
+            .upload-area:hover {
+                border-color: #667eea;
+                background: #f0f4ff;
+                transform: translateY(-2px);
+            }
+            .upload-area.dragover {
+                border-color: #667eea;
+                background: #e0e7ff;
+                transform: scale(1.02);
+            }
+            .upload-icon {
+                font-size: 3rem;
+                margin-bottom: 15px;
+            }
+            .upload-text {
+                font-size: 1.2rem;
+                color: #666;
+                margin-bottom: 10px;
+            }
+            .upload-hint {
+                font-size: 0.9rem;
+                color: #999;
+            }
+            input[type="file"] {
+                display: none;
+            }
+            .buttons {
+                margin-top: 20px;
+                display: flex;
+                gap: 10px;
+            }
+            button {
+                flex: 1;
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 14px 28px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+            button:hover:not(:disabled) {
+                background: #5568d3;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            }
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+                transform: none;
+            }
+            button.secondary {
+                background: #64748b;
+            }
+            button.secondary:hover:not(:disabled) {
+                background: #475569;
+            }
+            .output {
+                margin-top: 30px;
+            }
+            .font-preview {
+                background: #f8fafc;
+                border: 2px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 30px;
+                margin-bottom: 20px;
+            }
+            .preview-text {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+                text-align: center;
+                line-height: 1.4;
+            }
+            .font-info {
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+            }
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            .info-item {
+                padding: 15px;
+                background: #f8fafc;
+                border-radius: 6px;
+                border-left: 3px solid #667eea;
+            }
+            .info-label {
+                font-size: 0.85rem;
+                color: #64748b;
+                font-weight: 600;
+                text-transform: uppercase;
+                margin-bottom: 5px;
+            }
+            .info-value {
+                font-size: 1.1rem;
+                color: #1e293b;
+                font-weight: 500;
+            }
+            .status {
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                font-weight: 500;
+            }
+            .status.error {
+                background: #fee;
+                color: #c00;
+                border: 1px solid #fcc;
+            }
+            .status.success {
+                background: #efe;
+                color: #060;
+                border: 1px solid #cfc;
+            }
+            .status.info {
+                background: #eff;
+                color: #066;
+                border: 1px solid #cff;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔤 Font Analyzer</h1>
+                <p>Universal font parser with WOFF2 support</p>
+            </div>
+
+            <div class="content">
+                <div class="format-support">
+                    <h3>📋 Supported Formats</h3>
+                    <div class="format-grid">
+                        <div class="format-item supported">✓ TTF</div>
+                        <div class="format-item supported">✓ OTF</div>
+                        <div class="format-item supported">✓ WOFF</div>
+                        <div class="format-item supported">✓ WOFF2</div>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: #666">
+                        <strong>Using fontkit:</strong> Native WOFF2 support
+                        without WebAssembly issues
+                    </p>
+                </div>
+
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">
+                        Drop a font file here or click to browse
+                    </div>
+                    <div class="upload-hint">
+                        Supports TTF, OTF, WOFF, and WOFF2
+                    </div>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        accept=".ttf,.otf,.woff,.woff2"
+                    />
+                </div>
+
+                <div class="buttons">
+                    <button id="analyzeBtn" disabled>Analyze Font</button>
+                    <button id="clearBtn" class="secondary">Clear</button>
+                </div>
+
+                <div id="output"></div>
+            </div>
+        </div>
+
+        <script type="module" src="/main.js"></script>
+    </body>
+</html>

@@ -17,14 +17,19 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fontkit": "^2.0.4",
     "idb-keyval": "^6.2.2",
     "jspdf": "^3.0.3",
     "lucide-react": "^0.544.0",
+    
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.3",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.5.0",
+    
     "zustand": "^5.0.8"
   },
   "devDependencies": {

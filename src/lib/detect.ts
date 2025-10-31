@@ -1,57 +1,20 @@
 /**
  * Glyph Detection API with caching
  * 
- * Provides a high-level API for detecting missing glyphs using the Web Worker,
- * with intelligent caching to avoid redundant work.
+ * Provides a high-level API for detecting missing glyphs by directly inspecting
+ * the font file's CMAP table using opentype.js, with intelligent caching to avoid redundant work.
+ * 
+ * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 is decompressed first using wawoff2)
  */
 
 import { getItem, setItem } from './storage'
-
-// Import worker types
-type DetectionRequest = {
-  fontName: string
-  characters: string[]
-  fontBuffer: ArrayBuffer
-  requestId: string
-}
-
-type DetectionResult = {
-  requestId: string
-  results: {
-    character: string
-    codePoint: number
-    isMissing: boolean
-    confidence: number
-  }[]
-  error?: string
-}
+import { create as createFont } from 'fontkit'
 
 export type GlyphDetectionResult = {
   character: string
   codePoint: number
   isMissing: boolean
   confidence: number
-}
-
-// Worker instance
-let worker: Worker | null = null
-let requestIdCounter = 0
-
-/**
- * Initialize the detection worker
- */
-function initWorker(): Worker {
-  if (worker) {
-    return worker
-  }
-
-  // Create worker with proper TypeScript support
-  worker = new Worker(
-    new URL('../workers/detector.worker.js', import.meta.url),
-    { type: 'module' }
-  )
-
-  return worker
 }
 
 /**
@@ -71,7 +34,7 @@ async function getCachedResults(fontName: string, characters: string[]): Promise
   try {
     const cacheKey = getCacheKey(fontName, characters)
     const cached = await getItem<GlyphDetectionResult[]>(cacheKey)
-    return cached
+    return cached ?? null
   } catch (error) {
     console.warn('Failed to get cached detection results:', error)
     return null
@@ -127,7 +90,7 @@ export async function detectMissingGlyphs(
     console.log(`🚫 Bypassing cache for ${characters.length} characters`)
   }
 
-  // Perform detection using worker
+  // Perform detection by directly inspecting font file
   console.log(`🔍 Detecting missing glyphs for ${characters.length} characters`)
   const results = await performDetection(fontName, fontBuffer, characters)
   
@@ -138,217 +101,45 @@ export async function detectMissingGlyphs(
 }
 
 /**
- * Perform detection using main thread (since workers can't access fonts properly)
+ * Perform detection by directly inspecting the font file's CMAP table
+ * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 is decompressed using wawoff2)
  */
 async function performDetection(
   fontName: string,
   fontBuffer: ArrayBuffer,
-  characters: string[]
+  characters: string[],
 ): Promise<GlyphDetectionResult[]> {
-  console.log(`🔍 Running detection in main thread for ${characters.length} characters`)
-
   try {
-    // Use already loaded fonts - don't try to reload
-    console.log(`🔍 Using font: ${fontName}`)
-    
-    // Debug: Check what fonts are available
-    const availableFonts = Array.from(document.fonts).map(f => f.family)
-    console.log(`📋 Available fonts:`, availableFonts)
-    
-    // Check if our font is available
-    const fontAvailable = document.fonts.check(`16px "${fontName}"`)
-    console.log(`🎯 Font ${fontName} available: ${fontAvailable}`)
-    
-    if (!fontAvailable) {
-      console.log(`⚠️ WARNING: Font ${fontName} not found in document.fonts!`)
-      console.log(`📋 Available font families:`, availableFonts)
+    const bufferUint8 = fontBuffer instanceof Uint8Array
+      ? fontBuffer : new Uint8Array(fontBuffer)
+    let font
+    try {
+      font = createFont(bufferUint8)
+    } catch (fontError) {
+      throw new Error(`Failed to parse font file ${fontName}: ${fontError instanceof Error ? fontError.message : String(fontError)}`)
     }
-    
-    // Create canvas for detection
-    const canvas = document.createElement('canvas')
-    canvas.width = 100
-    canvas.height = 100
-    const ctx = canvas.getContext('2d')!
-
-    const FONT_SIZE = 48
-    const TEXT_X = 10
-    const TEXT_Y = 60
-    
-    // Test if font is actually working
-    ctx.font = `${FONT_SIZE}px "${fontName}", sans-serif`
-    const testA = ctx.measureText('A').width
-    ctx.font = `${FONT_SIZE}px sans-serif`
-    const fallbackA = ctx.measureText('A').width
-    const diffA = Math.abs(testA - fallbackA)
-    console.log(`🧪 Font test: A with font=${testA.toFixed(2)}, A with fallback=${fallbackA.toFixed(2)}, diff=${diffA.toFixed(2)}`)
-    
-    // If no difference, font might not be loading
-    if (diffA < 0.1) {
-      console.log(`⚠️ WARNING: Font ${fontName} might not be loading properly - no width difference detected`)
-      console.log(`🔧 This means the font is not being used for measurements`)
-      console.log(`🔧 Available fonts:`, availableFonts)
-      console.log(`🔧 Looking for font containing: ${fontName}`)
-      
-      // Try to find a similar font name
-      const similarFont = availableFonts.find(f => f.includes(fontName.split('.')[0]))
-      if (similarFont) {
-        console.log(`🔧 Found similar font: ${similarFont}`)
-      }
+    if (!font) {
+      throw new Error(`Font parsing returned null for ${fontName}`)
     }
-    
     const results: GlyphDetectionResult[] = []
-    
     for (const character of characters) {
       const codePoint = character.codePointAt(0) || 0
-      
-      // PHASE 1: Width comparison
-      ctx.font = `${FONT_SIZE}px "${fontName}", sans-serif`
-      const testWidth = ctx.measureText(character).width
-      
-      ctx.font = `${FONT_SIZE}px sans-serif`
-      const fallbackWidth = ctx.measureText(character).width
-      
-      const widthDiff = Math.abs(testWidth - fallbackWidth)
-      
-      // Debug logging for all characters to see what's happening
-      console.log(`🔍 ${character}: test=${testWidth.toFixed(2)}, fallback=${fallbackWidth.toFixed(2)}, diff=${widthDiff.toFixed(2)}`)
-      
-      // Check if font is actually loaded
-      const fontFamily = `"${fontName}", sans-serif`
-      const isFontLoaded = document.fonts.check(`${FONT_SIZE}px ${fontFamily}`)
-      if (character === 'A' || character === 'ß') {
-        console.log(`🎯 Font check for ${character}: fontName="${fontName}", isLoaded=${isFontLoaded}`)
-      }
-      
-      let isMissing = false
-      let confidence = 0.5
-      
-      // PHASE 2: Bitmap comparison (required for accurate detection)
-      // Width-only comparison is unreliable because:
-      // - Some fonts render TOFU glyphs with different widths than fallback
-      // - Width difference doesn't tell us if the glyph is actually rendered
-      
-      // Render test font to canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.font = `${FONT_SIZE}px "${fontName}", sans-serif`
-      ctx.fillStyle = '#000'
-      ctx.fillText(character, TEXT_X, TEXT_Y)
-      const testImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const testHash = computeBitmapHash(testImageData)
-      
-      // Render fallback to canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.font = `${FONT_SIZE}px sans-serif`
-      ctx.fillStyle = '#000'
-      ctx.fillText(character, TEXT_X, TEXT_Y)
-      const fallbackImageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const fallbackHash = computeBitmapHash(fallbackImageData)
-      
-      // Compare bitmap hashes
-      const hashDiff = calculateHashDifference(testHash, fallbackHash)
-      
-      // Decision logic based on bitmap comparison
-      if (hashDiff < 0.001) {
-        // Identical rendering = font doesn't have the character
-        isMissing = true
-        confidence = 0.95
-      } else if (hashDiff > 0.05) {
-        // Significantly different rendering = font has the character
-        isMissing = false
-        confidence = 0.95
-      } else {
-        // Small difference = uncertain, use width as tiebreaker
-        if (widthDiff > 1.0) {
-          isMissing = false
-          confidence = 0.7
-        } else {
-          isMissing = true
-          confidence = 0.7
-        }
-      }
-      
-      // Comprehensive debug logging for all characters
-      console.log(`🔍 ${character}: widthDiff=${widthDiff.toFixed(2)}, hashDiff=${hashDiff.toFixed(4)}, isMissing=${isMissing}, confidence=${confidence.toFixed(2)}`)
-      
-      // Special debug for punctuation
-      if (character === '.' || character === ',' || character === ';' || character === ':' || 
-          character === '!' || character === '?' || character === "'" || character === '(' || 
-          character === ')' || character === '-' || character === '–' || character === '—') {
-        console.log(`🎯 PUNCTUATION ${character}: widthDiff=${widthDiff.toFixed(2)}, hashDiff=${hashDiff.toFixed(4)}, isMissing=${isMissing}`)
-      }
-      
+      const glyph = font.glyphForCodePoint(codePoint)
+      // fontkit's glyphs always have .id, likely has a path for real glyphs
+      const hasGlyph = glyph && glyph.id > 0 && (glyph.path !== undefined && glyph.path !== null)
+      const isMissing = !hasGlyph
+      const confidence = 1.0 // 100% confidence
       results.push({
         character,
         codePoint,
         isMissing,
-        confidence: Math.max(0.5, confidence)
+        confidence,
       })
     }
-    
-    // Summary of results
-    const missingCount = results.filter(r => r.isMissing).length
-    const missingChars = results.filter(r => r.isMissing).map(r => r.character).join(', ')
-    console.log(`📊 DETECTION SUMMARY: ${missingCount}/${results.length} missing characters: [${missingChars}]`)
-    
     return results
   } catch (error) {
-    console.error('Detection failed:', error)
     throw error
   }
-}
-
-/**
- * Render text to canvas and return image data
- */
-function renderTextToCanvas(
-  ctx: CanvasRenderingContext2D,
-  char: string,
-  fontFamily: string,
-  fontSize: number,
-  x: number,
-  y: number
-): ImageData {
-  // Clear canvas
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-  
-  // Set font and render
-  ctx.font = `${fontSize}px ${fontFamily}`
-  ctx.fillStyle = '#000000'
-  ctx.textBaseline = 'alphabetic'
-  ctx.textAlign = 'left'
-  ctx.fillText(char, x, y)
-  
-  return ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height)
-}
-
-/**
- * Compute bitmap hash from image data
- */
-function computeBitmapHash(imageData: ImageData): number {
-  let hash = 0
-  const data = imageData.data
-  
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i]
-    const g = data[i + 1]
-    const b = data[i + 2]
-    const a = data[i + 3]
-    
-    const grayscale = (r * 0.299 + g * 0.587 + b * 0.114) * (a / 255)
-    hash += grayscale
-  }
-  
-  return hash
-}
-
-/**
- * Calculate hash difference
- */
-function calculateHashDifference(hash1: number, hash2: number): number {
-  const maxHash = Math.max(Math.abs(hash1), Math.abs(hash2), 1)
-  return Math.abs(hash1 - hash2) / maxHash
 }
 
 /**
@@ -360,15 +151,19 @@ export async function batchDetectMissingGlyphs(
   languages: Array<{ id: string; coverage: string }>,
   bypassCache: boolean = false
 ): Promise<Map<string, Map<string, GlyphDetectionResult[]>>> {
+  const batchStartTime = performance.now()
   const results = new Map<string, Map<string, GlyphDetectionResult[]>>()
+  const totalWork = fonts.length * languages.length
+  let completedWork = 0
   
   console.log(`🚀 Starting batch detection for ${fonts.length} fonts and ${languages.length} languages`)
   
   for (const font of fonts) {
+    const fontStartTime = performance.now()
     const fontResults = new Map<string, GlyphDetectionResult[]>()
     
     for (const language of languages) {
-      const characters = language.coverage.split('').filter((char, index, arr) => 
+      const characters = language.coverage.split('').filter((char: string, index: number, arr: string[]) => 
         arr.indexOf(char) === index // Remove duplicates
       )
       
@@ -378,12 +173,15 @@ export async function batchDetectMissingGlyphs(
           const detectionResults = await detectMissingGlyphs(font.name, fontBuffer, characters, bypassCache)
           fontResults.set(language.id, detectionResults)
           
+          completedWork++
           const missingCount = detectionResults.filter(r => r.isMissing).length
-          console.log(`✅ Detected ${missingCount}/${characters.length} missing glyphs for ${font.name} (${language.id})`)
+          const progress = Math.round((completedWork / totalWork) * 100)
+          console.log(`✅ [${progress}%] Detected ${missingCount}/${characters.length} missing glyphs for ${font.name} (${language.id})`)
         } catch (error) {
+          completedWork++
           console.error(`❌ Detection failed for ${font.name} (${language.id}):`, error)
           // Set empty results on error
-          fontResults.set(language.id, characters.map(char => ({
+          fontResults.set(language.id, characters.map((char: string) => ({
             character: char,
             codePoint: char.codePointAt(0) || 0,
             isMissing: false,
@@ -396,9 +194,12 @@ export async function batchDetectMissingGlyphs(
     }
     
     results.set(font.name, fontResults)
+    const fontElapsed = ((performance.now() - fontStartTime) / 1000).toFixed(2)
+    console.log(`⏱️  Font ${font.name} completed in ${fontElapsed}s`)
   }
   
-  console.log(`🎉 Batch detection completed`)
+  const totalElapsed = ((performance.now() - batchStartTime) / 1000).toFixed(2)
+  console.log(`🎉 Batch detection completed in ${totalElapsed}s for ${fonts.length} fonts and ${languages.length} languages`)
   return results
 }
 

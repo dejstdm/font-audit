@@ -1,0 +1,9 @@
+{
+  "id": "lt",
+  "name": "Lithuanian",
+  "nativeName": "Lietuvių",
+  "rtl": false,
+  "sample": "Įlinkęs fechtuotojas šauniai degęs pjūklu.",
+  "coverage": "ABCČDEĘĖFGHIĮYJKLMNOPRSŠTUŲŪVZŽabcčdeęėfghiįyjklmnoprsštuųūvzž0123456789.,;:!?'()-–—"
+}
+

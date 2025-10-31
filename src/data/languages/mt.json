@@ -1,0 +1,9 @@
+{
+  "id": "mt",
+  "name": "Maltese",
+  "nativeName": "Malti",
+  "rtl": false,
+  "sample": "L-għalliem qal li jrid jitkellem dwar il-kontenut.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzħ0123456789.,;:!?'()-–—"
+}
+

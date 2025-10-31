@@ -1,0 +1,9 @@
+{
+  "id": "vls",
+  "name": "Flemish",
+  "nativeName": "Vlaams",
+  "rtl": false,
+  "sample": "Bakker Sjoerd geeft vis; zo'n prachtige kaft toont de verwarming.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäëïöü0123456789.,;:!?'()-–—"
+}
+

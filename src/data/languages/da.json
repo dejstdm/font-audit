@@ -1,0 +1,9 @@
+{
+  "id": "da",
+  "name": "Danish",
+  "nativeName": "Dansk",
+  "rtl": false,
+  "sample": "Quizdeltagerne spiste jordbær med fløde, mens cirkusklovnen.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅabcdefghijklmnopqrstuvwxyzæøå0123456789.,;:!?'()-–—"
+}
+

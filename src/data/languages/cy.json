@@ -1,0 +1,9 @@
+{
+  "id": "cy",
+  "name": "Welsh",
+  "nativeName": "Cymraeg",
+  "rtl": false,
+  "sample": "Cymdeithaswyr hyfedr sy'n cwffio ffasiynau gyda'r gost.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzẃŵŷỳ0123456789.,;:!?'()-–—"
+}
+

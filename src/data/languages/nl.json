@@ -1,0 +1,9 @@
+{
+  "id": "nl",
+  "name": "Dutch",
+  "nativeName": "Nederlands",
+  "rtl": false,
+  "sample": "Bakker Sjoerd geeft vis; zo'n prachtige kaft toont de verwarming.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäëïöü0123456789.,;:!?'()-–—"
+}
+

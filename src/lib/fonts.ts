@@ -5,6 +5,7 @@ export type LoadedFont = {
   weight: string
   fileName: string
   blob: Blob
+  arrayBuffer: ArrayBuffer // NEW: for detection
 }
 
 export async function readFileAsArrayBuffer(file: File) {
@@ -48,6 +49,7 @@ export async function loadFontFromArrayBuffer(file: File, buffer: ArrayBuffer) {
       style,
       fileName: file.name,
       blob,
+      arrayBuffer: buffer, // <--- exposed for detection
     }
 
     return metadata

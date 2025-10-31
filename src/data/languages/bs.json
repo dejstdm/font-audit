@@ -1,0 +1,9 @@
+{
+  "id": "bs",
+  "name": "Bosnian",
+  "nativeName": "Bosanski",
+  "rtl": false,
+  "sample": "Žaba pije vodu sa časa zbog želje za životom.",
+  "coverage": "ABCDČĆDĐEFGHIJKLMNOPRSŠTUVZŽabcčćdđefghijklmnoprsštuvzž0123456789.,;:!?'()-–—"
+}
+

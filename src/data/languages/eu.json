@@ -1,0 +1,9 @@
+{
+  "id": "eu",
+  "name": "Basque",
+  "nativeName": "Euskara",
+  "rtl": false,
+  "sample": "Nire aitak lehenbizi kalean eskaleari dirua eman zion.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzññ0123456789.,;:!?'()-–—"
+}
+

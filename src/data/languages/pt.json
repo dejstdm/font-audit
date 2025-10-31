@@ -1,0 +1,9 @@
+{
+  "id": "pt",
+  "name": "Portuguese",
+  "nativeName": "Português",
+  "rtl": false,
+  "sample": "À noite, vovô Kowalsky vê o ímã cair no pé do pinguim.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzàáâãéêíóôõúü0123456789.,;:!?'()-–—"
+}
+

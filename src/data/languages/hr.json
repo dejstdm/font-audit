@@ -1,0 +1,9 @@
+{
+  "id": "hr",
+  "name": "Croatian",
+  "nativeName": "Hrvatski",
+  "rtl": false,
+  "sample": "Žaba pije vodu sa čaše zbog želje za životom.",
+  "coverage": "ABCDČĆDĐEFGHIJKLMNOPRSŠTUVZŽabcčćdđefghijklmnoprsštuvzž0123456789.,;:!?'()-–—"
+}
+

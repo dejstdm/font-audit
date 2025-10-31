@@ -1,0 +1,9 @@
+{
+  "id": "ro",
+  "name": "Romanian",
+  "nativeName": "Română",
+  "rtl": false,
+  "sample": "Muzicologă în bej vând whisky și tequila, preț fix.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZĂÂÎabcdeghijklmnopqrstuvwxyzăâî0123456789.,;:!?'()-–—"
+}
+

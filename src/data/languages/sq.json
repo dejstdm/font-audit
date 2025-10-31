@@ -1,0 +1,9 @@
+{
+  "id": "sq",
+  "name": "Albanian",
+  "nativeName": "Shqip",
+  "rtl": false,
+  "sample": "Një gjë më duhet gjatë gjithë jetës sime.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÇËabcdeëfghijklmnopqrstuvwxyzç0123456789.,;:!?'()-–—"
+}
+

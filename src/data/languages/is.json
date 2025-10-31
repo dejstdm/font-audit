@@ -1,0 +1,9 @@
+{
+  "id": "is",
+  "name": "Icelandic",
+  "nativeName": "Íslenska",
+  "rtl": false,
+  "sample": "Kæmi ný öxi hér ykist þjófum nú bæði víl og ádrepa.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÁÐÉÍÓÚÝÞÆÖabcdefghijklmnopqrstuvwxyzáðéíóúýþæö0123456789.,;:!?'()-–—"
+}
+

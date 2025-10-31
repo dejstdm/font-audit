@@ -3,11 +3,15 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 import { VitePWA } from "vite-plugin-pwa"
 import path from "path"
+import wasm from "vite-plugin-wasm"
+import topLevelAwait from "vite-plugin-top-level-await"
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+    wasm(),
+    topLevelAwait(),
     VitePWA({
       registerType: "autoUpdate",
       devOptions: { enabled: true },
@@ -26,5 +30,8 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  optimizeDeps: {
+    include: ['fontkit', 'restructure'],
   },
 })

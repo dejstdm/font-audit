@@ -1,0 +1,9 @@
+{
+  "id": "hu",
+  "name": "Hungarian",
+  "nativeName": "Magyar",
+  "rtl": false,
+  "sample": "Árvíztűrő tükörfúrógép alatt elsülő zsibbasztó üveges gesztus.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÖŐÚÜŰabcdefghijklmnopqrstuvwxyzáéíóöőúüű0123456789.,;:!?'()-–—"
+}
+
