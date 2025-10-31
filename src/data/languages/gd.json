@@ -1,0 +1,9 @@
+{
+  "id": "gd",
+  "name": "Scottish Gaelic",
+  "nativeName": "Gàidhlig",
+  "rtl": false,
+  "sample": "Chuir Uilleam Daibhidh ceann air an lochan mòr aig deireadh.",
+  "coverage": "ABCDEFGHILMNOPRSTUabcdefghilmnoprstuàèìòù0123456789.,;:!?'()-–—"
+}
+

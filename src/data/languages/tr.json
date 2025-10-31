@@ -1,0 +1,9 @@
+{
+  "id": "tr",
+  "name": "Turkish",
+  "nativeName": "Türkçe",
+  "rtl": false,
+  "sample": "Pijamalı hasta yağız şoföre çabucak güvendi.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÇĞİÖŞÜabcçdefgğhıijklmnoöprsştuüvyz0123456789.,;:!?'()-–—"
+}
+

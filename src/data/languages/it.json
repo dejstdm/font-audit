@@ -1,0 +1,9 @@
+{
+  "id": "it",
+  "name": "Italian",
+  "nativeName": "Italiano",
+  "rtl": false,
+  "sample": "Quel fez sghembo copre davanti; oggi lo porto per dimostrare.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzàéèíìîòóù0123456789.,;:!?'()-–—"
+}
+

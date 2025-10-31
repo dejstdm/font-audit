@@ -1,0 +1,9 @@
+{
+  "id": "pl",
+  "name": "Polish",
+  "nativeName": "Polski",
+  "rtl": false,
+  "sample": "Pchnąć w tę łódź jeża lub osiem skrzyń fig.",
+  "coverage": "AĄBCĆDEĘFGHIJKLŁMNŃOÓPQRSŚTUVWXYZŹŻaąbcćdeęfghijklłmnńoópqrsśtuvwxyzźż0123456789.,;:!?'()-–—"
+}
+

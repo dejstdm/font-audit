@@ -42,5 +42,20 @@
       "ja",
       "zh-Hans"
     ]
+  },
+  {
+    "id": "eu-extend",
+    "name": "EU Extend",
+    "languages": [
+      "it",
+      "de",
+      "fr",
+      "en",
+      "tr",
+      "pl",
+      "el",
+      "nl",
+      "pt"
+    ]
   }
 ]

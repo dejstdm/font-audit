@@ -1,0 +1,9 @@
+{
+  "id": "cs",
+  "name": "Czech",
+  "nativeName": "Čeština",
+  "rtl": false,
+  "sample": "Nechť již hříšné saxofony ďáblů rozezvučí síň úděsnými tóny waltzu.",
+  "coverage": "ABCČDĎEFGHCHIÍJKLMNŇOPQRSŠTŤUÚŮVWXYÝZŽabcčdďefghchíijklmnňopqrsštťuúůvwxyýzž0123456789.,;:!?'()-–—"
+}
+

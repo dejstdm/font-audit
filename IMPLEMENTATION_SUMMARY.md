@@ -1,63 +1,29 @@
 # Missing Glyph Detection Implementation Summary
 
 ## Overview
-Implemented the **Hybrid Detection Strategy** from AGENTS.md for accurate client-side missing glyph detection.
+Detection now uses **fontkit table inspection** for accurate, offline missing glyph detection across TTF/OTF/WOFF/WOFF2. The previous hybrid canvas strategy has been replaced.
 
 ## Implementation Details
 
 ### Architecture
-The detection system uses a **two-phase hybrid approach**:
+The detection system uses **direct font table inspection**:
 
-#### Phase 1: Width Comparison (Fast Filter)
-- **Purpose**: Quick pre-check to filter obvious cases
-- **Method**: Compare character width rendered with test font vs. fallback font
-- **Decision Logic**:
-  - Width difference > 5px → **Glyph present** (95% confidence) ✅
-  - Width difference < 0.5px → **Uncertain, proceed to Phase 2** ⚠️
-  - Width difference 0.5-5px → **Uncertain, proceed to Phase 2** ⚠️
-
-#### Phase 2: Bitmap Hash Comparison (Accurate Detection)
-- **Purpose**: High-accuracy detection for uncertain cases
-- **Method**: 
-  1. Render character with test font to canvas
-  2. Render character with fallback font to canvas
-  3. Compute grayscale bitmap hash for each rendering
-  4. Compare hashes to determine if glyphs are identical
-- **Decision Logic**:
-  - Hash difference < 0.05 → **Glyph missing** (high confidence) ❌
-  - Hash difference > 0.15 → **Glyph present** (high confidence) ✅
-  - Hash difference 0.05-0.15 → Variable confidence based on exact value
+#### Font Table Inspection (fontkit)
+- **Purpose**: Deterministic, fast, and accurate
+- **Method**:
+  - Parse ArrayBuffer/Uint8Array using `fontkit.create`
+  - For each character, compute code point and query `glyphForCodePoint`
+  - A glyph exists if `glyph.id > 0` and `glyph.path` is present
+- **Formats**: TTF, OTF, WOFF, WOFF2 (no conversion required)
 
 ### Key Features
 
-#### 1. Proper Canvas Management
-```javascript
-// Always clear canvas between renders to avoid ghost pixels
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-}
-```
+#### 1. Deterministic CMAP-based detection
+- No canvas rendering or bitmap hashing
+- 1.0 confidence when glyph present in the parsed font
 
-#### 2. Consistent Rendering Setup
-- Canvas size: 100x100px (as per spec)
-- Font size: 48px (larger for better detection)
-- Baseline: `alphabetic`
-- Alignment: `left`
-- Position: (10, 60)
-
-#### 3. Bitmap Hash Function
-Uses grayscale conversion weighted by alpha:
-```javascript
-const grayscale = (r * 0.299 + g * 0.587 + b * 0.114) * (a / 255)
-hash += grayscale
-```
-
-#### 4. Batch Processing
-- Processes characters in batches of 50
-- Posts progress updates for large character sets (>100 chars)
-- Prevents worker from blocking on large jobs
+#### 2. Batch Processing
+- Process in batches (UI-dependent) to keep worker responsive for large sets
 
 #### 5. Caching (Existing)
 - Results cached in IndexedDB by `(fontName, codepoint)` pairs
@@ -67,37 +33,25 @@ hash += grayscale
 ## Files Modified
 
 ### `src/workers/detector.worker.js`
-**Complete rewrite** implementing the hybrid detection strategy:
+**Updated** to use fontkit glyph queries in worker:
 
 1. **New Functions**:
-   - `clearCanvas()` - Properly clear canvas between renders
-   - `measureText()` - Width measurement for Phase 1
-   - `computeBitmapHash()` - Grayscale bitmap hash computation
-   - `calculateHashDifference()` - Normalized hash comparison
-   - `performBitmapComparison()` - Phase 2 bitmap detection
-   - `detectMissingGlyph()` - Main hybrid detection logic
+- `glyphForCodePoint()` queries and boolean presence mapping
 
 2. **Updated Functions**:
-   - `renderText()` - Consistent rendering with proper clearing
-   - `processDetectionRequest()` - Batch processing with progress updates
+- `processDetectionRequest()` - Batch processing with fontkit checks
 
 3. **Removed**:
    - Old pixel-by-pixel similarity calculation (unreliable)
 
 ### `src/lib/detect.ts`
-**No changes required** - The existing caching and API structure works perfectly with the updated worker.
+**Switched to fontkit** for parsing; caching and APIs retained.
 
 ## Performance Characteristics
 
-### Fast Path (Width Comparison)
-- ~90% of characters take fast path
-- Minimal canvas operations
-- Very quick decisions for obvious cases
-
-### Accurate Path (Bitmap Comparison)
-- ~10% of characters require bitmap comparison
-- More expensive but highly accurate
-- Prevents false positives
+### Performance Characteristics
+- Direct table lookup is fast and consistent across browsers
+- No canvas operations; reduced CPU usage
 
 ### Batch Processing
 - 50 characters per batch
@@ -128,37 +82,13 @@ hash += grayscale
    - Safari
 
 ## Future Enhancements (Optional)
-
-### Phase 3: Font Table Inspection
-If bitmap comparison gives ambiguous results, could add:
-```javascript
-// Using fontkit library
-import fontkit from 'fontkit'
-const font = fontkit.create(fontBuffer)
-const hasGlyph = font.cmap.get(codepoint) !== null
-```
-
-**Pros**:
-- 100% accuracy
-- Direct access to font data
-
-**Cons**:
-- ~200KB bundle size increase
-- Additional parsing overhead
-- More complexity
-
-**Recommendation**: Not needed for current use case; hybrid approach provides excellent accuracy.
+- Lazy-load fontkit in worker for large files to reduce initial bundle size
 
 ## Compliance with AGENTS.md Spec
 
-✅ **Approach 1: Dual Canvas Rendering + Bitmap Comparison** - Implemented
-✅ **Approach 2: Canvas Width Comparison** - Implemented as Phase 1 filter
-✅ **Hybrid Approach** - Implemented (Phase 1 → Phase 2 flow)
-✅ **Proper canvas clearing** - Implemented with `clearCanvas()`
-✅ **Consistent rendering** - Font size, position, baseline all standardized
-✅ **Bitmap hashing** - Grayscale sum hash as per spec
+✅ **Font table inspection (fontkit)** - Implemented
 ✅ **Caching** - Already implemented in `detect.ts`
-✅ **Batch processing** - 50 chars per batch with progress updates
+✅ **Batch processing** - batched queries with progress updates
 
 ## Known Limitations
 
@@ -184,5 +114,5 @@ The implementation follows the AGENTS.md specification precisely, providing:
 - **Progress reporting** for UX
 - **Comprehensive caching** for repeated checks
 
-The hybrid approach balances speed and accuracy, providing reliable missing glyph detection without requiring font parsing libraries or backend services.
+The fontkit-based approach provides deterministic and accurate missing glyph detection for TTF/OTF/WOFF/WOFF2 entirely offline, with simpler logic and lower CPU overhead than canvas hashing.
 

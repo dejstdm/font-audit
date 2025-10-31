@@ -1,14 +1,50 @@
 import { useMemo, useState } from 'react'
 import presetsData from '../data/presets.json'
 import ar from '../data/languages/ar.json'
+import be from '../data/languages/be.json'
+import bg from '../data/languages/bg.json'
+import bs from '../data/languages/bs.json'
+import ca from '../data/languages/ca.json'
+import cs from '../data/languages/cs.json'
+import cy from '../data/languages/cy.json'
+import da from '../data/languages/da.json'
 import de from '../data/languages/de.json'
+import el from '../data/languages/el.json'
 import en from '../data/languages/en.json'
 import es from '../data/languages/es.json'
+import et from '../data/languages/et.json'
+import eu from '../data/languages/eu.json'
+import fi from '../data/languages/fi.json'
 import fr from '../data/languages/fr.json'
+import ga from '../data/languages/ga.json'
+import gd from '../data/languages/gd.json'
 import he from '../data/languages/he.json'
+import hr from '../data/languages/hr.json'
+import hu from '../data/languages/hu.json'
+import is from '../data/languages/is.json'
+import it from '../data/languages/it.json'
 import ja from '../data/languages/ja.json'
+import lb from '../data/languages/lb.json'
+import lt from '../data/languages/lt.json'
+import lv from '../data/languages/lv.json'
+import mk from '../data/languages/mk.json'
+import mo from '../data/languages/mo.json'
+import mt from '../data/languages/mt.json'
+import nl from '../data/languages/nl.json'
+import no from '../data/languages/no.json'
+import pl from '../data/languages/pl.json'
+import pt from '../data/languages/pt.json'
+import ro from '../data/languages/ro.json'
+import ru from '../data/languages/ru.json'
+import sk from '../data/languages/sk.json'
+import sl from '../data/languages/sl.json'
+import sq from '../data/languages/sq.json'
 import srCyrl from '../data/languages/sr-Cyrl.json'
 import srLatn from '../data/languages/sr-Latn.json'
+import sv from '../data/languages/sv.json'
+import tr from '../data/languages/tr.json'
+import uk from '../data/languages/uk.json'
+import vls from '../data/languages/vls.json'
 import zhHans from '../data/languages/zh-Hans.json'
 import { useFontStore } from '../state/store'
 import { X, Check } from 'lucide-react'
@@ -45,6 +81,42 @@ const ALL_LANGUAGES: LanguageDefinition[] = [
   he,
   ja,
   zhHans,
+  sq,
+  eu,
+  be,
+  bs,
+  bg,
+  ca,
+  hr,
+  cs,
+  da,
+  nl,
+  et,
+  fi,
+  vls,
+  el,
+  hu,
+  is,
+  ga,
+  it,
+  lv,
+  lt,
+  lb,
+  mk,
+  mt,
+  mo,
+  no,
+  pl,
+  pt,
+  ro,
+  ru,
+  gd,
+  sk,
+  sl,
+  sv,
+  tr,
+  uk,
+  cy,
 ]
 
 const PRESETS = presetsData as PresetDefinition[]

@@ -1,0 +1,9 @@
+{
+  "id": "lb",
+  "name": "Luxembourgish",
+  "nativeName": "Lëtzebuergesch",
+  "rtl": false,
+  "sample": "Dës Text ass an de Lëtzebuerger Sprooch geschriwwen.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzé0123456789.,;:!?'()-–—"
+}
+

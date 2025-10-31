@@ -1,0 +1,9 @@
+{
+  "id": "et",
+  "name": "Estonian",
+  "nativeName": "Eesti",
+  "rtl": false,
+  "sample": "Põdur ning võib-olla läheb vett üle järve kalli.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöõšžü0123456789.,;:!?'()-–—"
+}
+

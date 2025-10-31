@@ -1,0 +1,9 @@
+{
+  "id": "ga",
+  "name": "Irish",
+  "nativeName": "Gaeilge",
+  "rtl": false,
+  "sample": "D'ḟuascail Íosa Úrṁac na hÓiġe Beannaiġṫe ort.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzáéíóú0123456789.,;:!?'()-–—"
+}
+

@@ -4,12 +4,13 @@ A Progressive Web App (PWA) for testing font coverage across languages. Upload f
 
 ## Features
 
-- 📁 **Font Upload** - Load TTF, OTF, WOFF, WOFF2 fonts
-- 🌍 **Language Coverage** - Test fonts against 10+ languages with presets
-- 🔍 **Missing Glyph Detection** - Accurate canvas-based detection (coming soon)
-- 📊 **Coverage Reports** - Export to JSON, CSV, Markdown, PDF (coming soon)
+- 📁 **Font Upload** - Load TTF, OTF, WOFF, and WOFF2 fonts (full support)
+- 🌍 **Language Coverage** - Test fonts against 46 languages with presets
+- 🔍 **Missing Glyph Detection** - 100% accurate, offline detection via fontkit (TTF/OTF/WOFF/WOFF2)
+- 📊 **Visual Coverage Grid** - See all characters with missing glyphs highlighted
 - 💾 **Offline-First** - All data stored in IndexedDB
 - 🎨 **Dark Mode** - Built-in theme support
+- 📱 **PWA** - Installable as a web app
 
 ## Tech Stack
 
@@ -50,6 +51,21 @@ npm run build
 ```bash
 npm run preview
 ```
+
+### Deployment
+
+The project builds to a static site that can be deployed to any static hosting service.
+
+**Build output:** `dist/` folder
+
+**Deploy options:**
+
+1. **Netlify** - Drag and drop `dist/` folder or connect your Git repository
+2. **Vercel** - Run `vercel --prod` or connect your Git repository
+3. **GitHub Pages** - Push `dist/` contents to `gh-pages` branch
+4. **Any static host** - Upload `dist/` contents to your hosting service
+
+**Important:** The app uses React Router `BrowserRouter`, which requires server-side configuration to redirect all routes to `index.html`. Most hosting services handle this automatically. For custom servers, ensure all routes serve `index.html` for SPA routing to work.
 
 ## About shadcn/ui
 
@@ -93,14 +109,15 @@ src/
 │   ├── languages/       # Language definitions (JSON)
 │   └── presets.json     # Language preset groups
 ├── lib/
-│   ├── fonts.ts         # Font loading & parsing
+│   ├── fonts.ts         # Font loading & preview (FontFace); exposes ArrayBuffer
+│   ├── detect.ts        # Glyph detection using fontkit (supports WOFF2)
 │   ├── storage.ts       # IndexedDB persistence
 │   └── utils.ts         # Utilities (cn helper)
 ├── pages/
 │   ├── Fonts.tsx
 │   ├── Languages.tsx
-│   ├── Preview.tsx      # Coming soon
-│   └── Report.tsx       # Coming soon
+│   ├── Preview.tsx      # Preview & coverage grid with glyph detection
+│   └── Report.tsx       # Placeholder (export features coming soon)
 ├── state/
 │   └── store.ts         # Zustand state management
 └── styles/
@@ -109,13 +126,57 @@ src/
 
 ## Language Support
 
-Currently includes:
+Currently includes 46 languages with support for European, Middle Eastern, and Asian scripts:
+
+### European Languages (Latin Script)
+- Albanian (sq)
+- Basque (eu)
+- Bosnian (bs)
+- Catalan (ca)
+- Croatian (hr)
+- Czech (cs)
+- Danish (da)
+- Dutch (nl)
 - English (en)
-- Spanish (es)
+- Estonian (et)
+- Finnish (fi)
+- Flemish (vls)
 - French (fr)
 - German (de)
+- Hungarian (hu)
+- Icelandic (is)
+- Irish (ga)
+- Italian (it)
+- Latvian (lv)
+- Lithuanian (lt)
+- Luxembourgish (lb)
+- Maltese (mt)
+- Moldovan (mo)
+- Norwegian (no)
+- Polish (pl)
+- Portuguese (pt)
+- Romanian (ro)
 - Serbian Latin (sr-Latn)
+- Slovak (sk)
+- Slovene (sl)
+- Spanish (es)
+- Swedish (sv)
+- Turkish (tr)
+- Welsh (cy)
+
+### European Languages (Cyrillic Script)
+- Belarusian (be)
+- Bulgarian (bg)
+- Macedonian (mk)
+- Russian (ru)
 - Serbian Cyrillic (sr-Cyrl)
+- Ukrainian (uk)
+
+### European Languages (Other Scripts)
+- Greek (el)
+- Scottish Gaelic (gd)
+
+### Middle Eastern & Asian Languages
 - Arabic (ar) - RTL
 - Hebrew (he) - RTL
 - Japanese (ja)

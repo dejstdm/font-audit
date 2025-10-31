@@ -1,0 +1,9 @@
+{
+  "id": "ca",
+  "name": "Catalan",
+  "nativeName": "Català",
+  "rtl": false,
+  "sample": "Jove xef, porti whisky amb quinze glaçons d'hidrogen.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÀÇÈÉÍÒÓÚÜabcdefghijklmnopqrstuvwxyzàçèéíòóúü0123456789.,;:!?'()-–—"
+}
+

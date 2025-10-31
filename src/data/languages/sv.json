@@ -1,0 +1,9 @@
+{
+  "id": "sv",
+  "name": "Swedish",
+  "nativeName": "Svenska",
+  "rtl": false,
+  "sample": "Yxskaftbud, ge vår wczonmö iq hjälp.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖabcdefghijklmnopqrstuvwxyzåäö0123456789.,;:!?'()-–—"
+}
+

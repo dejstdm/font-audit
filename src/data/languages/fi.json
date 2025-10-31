@@ -1,0 +1,9 @@
+{
+  "id": "fi",
+  "name": "Finnish",
+  "nativeName": "Suomi",
+  "rtl": false,
+  "sample": "Albert osti fagotin ja töräytti puhkuvan melodian.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöå0123456789.,;:!?'()-–—"
+}
+

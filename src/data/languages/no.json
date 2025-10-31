@@ -1,0 +1,9 @@
+{
+  "id": "no",
+  "name": "Norwegian",
+  "nativeName": "Norsk",
+  "rtl": false,
+  "sample": "Vår sære Zulu fra badeøya spilte jo whist og quickstep i min taxi.",
+  "coverage": "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅabcdefghijklmnopqrstuvwxyzæøå0123456789.,;:!?'()-–—"
+}
+
