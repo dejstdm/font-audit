@@ -45,19 +45,12 @@ export default function CoverageGrid() {
   }
 
   const clearCacheAndDetect = async () => {
-    console.log('🔴 Clear Cache & Detect button clicked!')
-    console.log('🔴 Fonts:', fonts.length, 'Languages:', languages.length)
-    
     try {
-      console.log('🧹 Clearing detection cache...')
       await clearDetectionCache()
-      console.log('✅ Cache cleared - all characters now untested')
-      
       // Clear the detection results to show untested state
       setDetectionResults(new Map())
-      console.log('🏁 Cache cleared - ready for fresh detection')
     } catch (error) {
-      console.error('❌ Cache clearing failed:', error)
+      console.error('Cache clearing failed:', error)
     }
   }
 
@@ -125,10 +118,7 @@ export default function CoverageGrid() {
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => {
-                  console.log('🔴 Button clicked! isDetecting:', isDetecting)
-                  clearCacheAndDetect()
-                }}
+                onClick={clearCacheAndDetect}
                 disabled={isDetecting}
               >
                 {isDetecting ? 'Clearing...' : 'Clear Cache'}

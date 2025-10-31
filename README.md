@@ -1,16 +1,17 @@
-# Font Audit Tool
+# Font Testing Tool
 
 A Progressive Web App (PWA) for testing font coverage across languages. Upload fonts, select languages, preview text rendering, and detect missing glyphs - all offline-first with no backend required.
 
 ## Features
 
-- 📁 **Font Upload** - Load TTF, OTF, WOFF, and WOFF2 fonts (full support)
-- 🌍 **Language Coverage** - Test fonts against 46 languages with presets
-- 🔍 **Missing Glyph Detection** - 100% accurate, offline detection via fontkit (TTF/OTF/WOFF/WOFF2)
-- 📊 **Visual Coverage Grid** - See all characters with missing glyphs highlighted
-- 💾 **Offline-First** - All data stored in IndexedDB
-- 🎨 **Dark Mode** - Built-in theme support
-- 📱 **PWA** - Installable as a web app
+- ✅ **Font Upload** - Load TTF, OTF, WOFF, and WOFF2 fonts (full support)
+- ✅ **Language Coverage** - Test fonts against 46 languages with presets
+- ✅ **Missing Glyph Detection** - 100% accurate, offline detection via fontkit (TTF/OTF/WOFF/WOFF2)
+- ✅ **Visual Coverage Grid** - See all characters with missing glyphs highlighted
+- ✅ **Export Reports** - Export coverage reports in JSON, CSV, Markdown, and PDF formats
+- ✅ **Offline-First** - All data stored in IndexedDB
+- ✅ **Dark Mode** - Built-in theme support
+- ✅ **PWA** - Installable as a web app, works fully offline
 
 ## Tech Stack
 
@@ -20,6 +21,13 @@ A Progressive Web App (PWA) for testing font coverage across languages. Upload f
 - **Storage:** IndexedDB (idb-keyval)
 - **PWA:** vite-plugin-pwa
 - **Icons:** Lucide React
+
+## Browser Requirements
+
+- **Modern browsers** with ES6+ support
+- **Chrome/Edge 90+**, **Firefox 88+**, **Safari 14+** recommended
+- Requires **WebAssembly** support (for fontkit library)
+- **IndexedDB** support required for offline functionality
 
 ## Getting Started
 
@@ -111,13 +119,16 @@ src/
 ├── lib/
 │   ├── fonts.ts         # Font loading & preview (FontFace); exposes ArrayBuffer
 │   ├── detect.ts        # Glyph detection using fontkit (supports WOFF2)
+│   ├── export.ts        # Export functionality (JSON, CSV, Markdown, PDF)
 │   ├── storage.ts       # IndexedDB persistence
 │   └── utils.ts         # Utilities (cn helper)
+├── workers/
+│   └── detector.worker.js  # Web Worker for font parsing and glyph detection
 ├── pages/
 │   ├── Fonts.tsx
 │   ├── Languages.tsx
 │   ├── Preview.tsx      # Preview & coverage grid with glyph detection
-│   └── Report.tsx       # Placeholder (export features coming soon)
+│   └── Report.tsx       # Coverage reports with export functionality
 ├── state/
 │   └── store.ts         # Zustand state management
 └── styles/
@@ -182,9 +193,31 @@ Currently includes 46 languages with support for European, Middle Eastern, and A
 - Japanese (ja)
 - Chinese Simplified (zh-Hans)
 
+## Export Formats
+
+The app supports exporting coverage reports in multiple formats:
+
+- **JSON** - Structured data format for programmatic processing
+- **CSV** - Spreadsheet-friendly format with one row per font/language combination
+- **Markdown** - Human-readable format with formatted tables and sections
+- **PDF** - Printable report with formatted pages and complete coverage details
+
+All exports include:
+- Metadata (timestamp, app version, font and language counts)
+- Complete font information
+- Per-font, per-language coverage statistics
+- Detailed missing glyph lists with Unicode codepoints
+
+## Usage
+
+1. **Upload Fonts**: Go to the Fonts page and drag & drop or select font files (TTF, OTF, WOFF, WOFF2)
+2. **Select Languages**: Navigate to Languages page and choose languages or presets to test
+3. **Preview Coverage**: Check the Preview page to see sample text and coverage grid with missing glyphs highlighted
+4. **Export Reports**: Visit the Report page to generate and export coverage reports in your preferred format
+
 ## Development Roadmap
 
-See [TASKS.md](./TASKS.md) for the complete development checklist.
+See [TASKS.md](./TASKS.md) for the development checklist. Core features are complete.
 
 ## Contributing
 
@@ -195,4 +228,4 @@ See [TASKS.md](./TASKS.md) for the complete development checklist.
 
 ## License
 
-MIT
+MIT - See [LICENSE](./LICENSE) file for details.

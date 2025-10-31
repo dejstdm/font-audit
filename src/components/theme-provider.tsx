@@ -42,12 +42,10 @@ export function ThemeProvider({
         : "light"
 
       root.classList.add(systemTheme)
-      console.log("Theme: system ->", systemTheme)
       return
     }
 
     root.classList.add(theme)
-    console.log("Theme set to:", theme)
   }, [theme])
 
   const value = {

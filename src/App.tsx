@@ -75,7 +75,7 @@ export default function App() {
               </Sheet>
 
               <NavLink to="/" className="component-app-logo text-xl font-semibold">
-                GlyphGlobe
+                FontAudit
               </NavLink>
             </div>
 

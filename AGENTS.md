@@ -103,11 +103,11 @@ vite.config.ts
 3. **Language data** (`data/languages`): seed ~50 JSONs; presets in `data/presets.json`.
 4. **Detection** (`lib/detect.ts`):
 
-   * Direct font file inspection using `opentype.js` - parses font file and queries CMAP table.
-   * Given (fontName, character), use `font.charToGlyph(character)` and check if glyph index is not 0 (notdef) and has path data.
+   * Direct font file inspection using `fontkit` - parses font file and queries CMAP table.
+   * Given (fontName, character), use `font.glyphForCodePoint(codePoint)` and check if glyph id > 0 and has path data.
    * Return `hasGlyph: boolean` with confidence 1.0. Cache in IndexedDB.
    * Batch-process coverage strings.
-   * Supports: TTF, OTF, WOFF formats. WOFF2 files are not currently supported and must be converted to TTF/OTF/WOFF first.
+   * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 fully supported via fontkit).
 5. **Preview** (`PreviewPane`, `CoverageGrid`):
 
    * Render sample sentence + coverage.
@@ -230,29 +230,28 @@ A lighter alternative if performance is critical:
 
 #### **Approach: Font Table Inspection (IMPLEMENTED - Most Accurate)**
 
-Parse the uploaded font binary (TTF/OTF/WOFF) to inspect the **CMAP** (character-to-glyph mapping) table:
+Parse the uploaded font binary (TTF/OTF/WOFF/WOFF2) to inspect the **CMAP** (character-to-glyph mapping) table:
 
-- Uses `opentype.js` library to parse the font file directly.
-- Query the CMAP table: `font.charToGlyph(character)` returns the glyph.
-- Check if glyph index is not 0 (notdef) and has path data to determine if character exists.
+- Uses `fontkit` library to parse the font file directly.
+- Query the CMAP table: `font.glyphForCodePoint(codePoint)` returns the glyph.
+- Check if glyph id > 0 (not notdef) and has path data to determine if character exists.
 - If glyph exists in CMAP with valid path, the font has the character.
 
 **Advantages:**
 - ✅ 100% accurate; directly reflects the font's data structure.
 - ✅ No rendering overhead or false positives from similar-looking glyphs.
-- ✅ Works with TTF, OTF, WOFF formats. WOFF2 files are fully supported for detection and preview via fontkit. The prior limitation was specific to opentype.js parsing; now, WOFF2 works natively in-browser with Vite.
+- ✅ Works with TTF, OTF, WOFF, WOFF2 formats (WOFF2 fully supported via fontkit).
 - ✅ Consistent results across all browsers and platforms.
 - ✅ Better bundler compatibility (works well with Vite/ESM).
 
 **Disadvantages:**
 - Requires font parsing library (~300–400 KB bundle impact).
-- WOFF2 files are not supported due to WebAssembly initialization issues in Vite/browser environments.
 
 **Current Implementation:**
-- Direct font file inspection using `opentype.parse(fontBuffer)`.
-- WOFF2 files are detected by signature ("wOF2") and rejected with a clear error message instructing users to convert them to TTF/OTF/WOFF.
-- `font.charToGlyph(character)` for each character in coverage set.
-- Check `glyph.index !== 0 && glyph.path` to determine existence.
+- Direct font file inspection using `fontkit.create(fontBuffer)`.
+- WOFF2 files are fully supported and handled natively by fontkit.
+- `font.glyphForCodePoint(codePoint)` for each character in coverage set.
+- Check `glyph.id > 0 && glyph.path` to determine existence.
 - Results cached in IndexedDB to avoid re-parsing.
 - Confidence is always 1.0 (100%) since we're reading the font file directly.
 

@@ -2,9 +2,9 @@
  * Glyph Detection API with caching
  * 
  * Provides a high-level API for detecting missing glyphs by directly inspecting
- * the font file's CMAP table using opentype.js, with intelligent caching to avoid redundant work.
+ * the font file's CMAP table using fontkit, with intelligent caching to avoid redundant work.
  * 
- * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 is decompressed first using wawoff2)
+ * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 fully supported via fontkit)
  */
 
 import { getItem, setItem } from './storage'
@@ -83,15 +83,11 @@ export async function detectMissingGlyphs(
   if (!bypassCache) {
     const cached = await getCachedResults(fontName, characters)
     if (cached) {
-      console.log(`📋 Using cached detection results for ${characters.length} characters`)
       return cached
     }
-  } else {
-    console.log(`🚫 Bypassing cache for ${characters.length} characters`)
   }
 
   // Perform detection by directly inspecting font file
-  console.log(`🔍 Detecting missing glyphs for ${characters.length} characters`)
   const results = await performDetection(fontName, fontBuffer, characters)
   
   // Cache results
@@ -102,7 +98,7 @@ export async function detectMissingGlyphs(
 
 /**
  * Perform detection by directly inspecting the font file's CMAP table
- * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 is decompressed using wawoff2)
+ * Supports: TTF, OTF, WOFF, WOFF2 formats (WOFF2 fully supported via fontkit)
  */
 async function performDetection(
   fontName: string,
@@ -151,15 +147,9 @@ export async function batchDetectMissingGlyphs(
   languages: Array<{ id: string; coverage: string }>,
   bypassCache: boolean = false
 ): Promise<Map<string, Map<string, GlyphDetectionResult[]>>> {
-  const batchStartTime = performance.now()
   const results = new Map<string, Map<string, GlyphDetectionResult[]>>()
-  const totalWork = fonts.length * languages.length
-  let completedWork = 0
-  
-  console.log(`🚀 Starting batch detection for ${fonts.length} fonts and ${languages.length} languages`)
   
   for (const font of fonts) {
-    const fontStartTime = performance.now()
     const fontResults = new Map<string, GlyphDetectionResult[]>()
     
     for (const language of languages) {
@@ -172,14 +162,8 @@ export async function batchDetectMissingGlyphs(
           const fontBuffer = await font.blob.arrayBuffer()
           const detectionResults = await detectMissingGlyphs(font.name, fontBuffer, characters, bypassCache)
           fontResults.set(language.id, detectionResults)
-          
-          completedWork++
-          const missingCount = detectionResults.filter(r => r.isMissing).length
-          const progress = Math.round((completedWork / totalWork) * 100)
-          console.log(`✅ [${progress}%] Detected ${missingCount}/${characters.length} missing glyphs for ${font.name} (${language.id})`)
         } catch (error) {
-          completedWork++
-          console.error(`❌ Detection failed for ${font.name} (${language.id}):`, error)
+          console.error(`Detection failed for ${font.name} (${language.id}):`, error)
           // Set empty results on error
           fontResults.set(language.id, characters.map((char: string) => ({
             character: char,
@@ -194,12 +178,7 @@ export async function batchDetectMissingGlyphs(
     }
     
     results.set(font.name, fontResults)
-    const fontElapsed = ((performance.now() - fontStartTime) / 1000).toFixed(2)
-    console.log(`⏱️  Font ${font.name} completed in ${fontElapsed}s`)
   }
-  
-  const totalElapsed = ((performance.now() - batchStartTime) / 1000).toFixed(2)
-  console.log(`🎉 Batch detection completed in ${totalElapsed}s for ${fonts.length} fonts and ${languages.length} languages`)
   return results
 }
 
@@ -212,9 +191,6 @@ export async function clearDetectionCache(): Promise<void> {
     const allKeys = await getItem<string[]>('_cache_keys') || []
     const detectionKeys = allKeys.filter(key => key.startsWith('glyph-detection-'))
     
-    console.log('🔍 All cache keys:', allKeys)
-    console.log('🔍 Detection keys to clear:', detectionKeys)
-    
     for (const key of detectionKeys) {
       await setItem(key, null) // Remove from cache
     }
@@ -223,39 +199,29 @@ export async function clearDetectionCache(): Promise<void> {
     // This is a more aggressive approach
     const aggressiveKeys = allKeys.filter(key => 
       key.includes('glyph-detection') || 
-      key.includes('detection') ||
-      key.includes('Styro')
+      key.includes('detection')
     )
-    
-    console.log('🔍 Aggressive keys to clear:', aggressiveKeys)
     
     for (const key of aggressiveKeys) {
       await setItem(key, null)
     }
     
-    console.log(`🗑️ Cleared ${detectionKeys.length} cached detection results`)
-    console.log(`🗑️ Aggressively cleared ${aggressiveKeys.length} additional keys`)
-    
     // Nuclear option: clear the entire IndexedDB database
-    console.log('💥 Nuclear option: clearing entire IndexedDB...')
     try {
       // Get all keys from IndexedDB and clear them
       const db = await import('idb-keyval')
       const allDbKeys = await db.keys()
-      console.log('🔍 All IndexedDB keys:', allDbKeys)
       
       // Clear all keys that might be related to detection
       for (const key of allDbKeys) {
         if (key.toString().includes('glyph-detection') || 
             key.toString().includes('detection') ||
-            key.toString().includes('Styro') ||
             key.toString().includes('font')) {
           await db.del(key)
-          console.log('🗑️ Cleared key:', key)
         }
       }
     } catch (dbError) {
-      console.log('⚠️ Could not clear IndexedDB directly:', dbError)
+      // Silently fail if we can't clear IndexedDB directly
     }
     
   } catch (error) {

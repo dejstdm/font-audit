@@ -1,10 +1,10 @@
-# TASKS � GlyphGlobe / font-audit (One-Step Mode)
+# TASKS - Font Testing Tool (font-audit)
 
 - [x] Create Vite app (done)
 - [x] Install Tailwind & wire up (done)
 
 ## Upcoming
-- [x] Install PWA plugin *(completed � remember to update TASKS.md whenever a task finishes)*
+- [x] Install PWA plugin *(completed remember to update TASKS.md whenever a task finishes)*
   - cmd:
     - npm i -D vite-plugin-pwa
     - Edit vite.config.ts to add VitePWA with minimal manifest
@@ -35,7 +35,7 @@
 
 - [x] Languages data & presets
   - cmd:
-    - Create src/data/languages/{en.json,sr-Latn.json,sr-Cyrl.json,...} (seed 8�10 for now)
+    - Create src/data/languages/{en.json,sr-Latn.json,sr-Cyrl.json,...} (seed 810 for now)
     - src/data/presets.json ("EU Core", "Cyrillic", "MENA", "CJK UI")
   - accept: Picker shows sets and can add/remove languages ✓ 10 languages + 4 presets working
 
@@ -50,18 +50,18 @@
     - src/workers/detector.worker.ts (canvas render & compare)
     - src/lib/detect.ts (API + cache)
     - Highlight missing glyphs with .missing class + tooltip U+XXXX
-  - accept: Known missing characters show as highlighted ✓ Web Worker with Canvas API detection, caching, and visual indicators
+  - accept: Known missing characters show as highlighted ✅ Web Worker with fontkit detection, caching, and visual indicators
 
-- [ ] Reports & export
+- [x] Reports & export
   - cmd:
     - src/components/ReportTable.tsx
     - src/lib/export.ts (JSON, CSV, MD, PDF via jsPDF)
-  - accept: Exports download with correct lists per font-language
+  - accept: Exports download with correct lists per font-language ✅ Export functionality complete with JSON, CSV, Markdown, and PDF formats
 
-- [ ] PWA polish
+- [x] PWA polish
   - cmd:
     - Add icons, offline page, "Delete all data" control
-  - accept: Installable; works offline after first load
+  - accept: Installable; works offline after first load ✅ PWA configured with service worker, offline support, and installable
 
 ## Later (optional)
 - [ ] Side-by-side font compare

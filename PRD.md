@@ -1,8 +1,8 @@
-# GlyphGlobe (font-audit) — Multilingual Font Coverage Tool (PWA)
+# Font Testing Tool (font-audit) — Multilingual Font Coverage Tool (PWA)
 
 **Version:** 1.0
 **Internal Repo:** `font-audit`
-**Public App Name:** `GlyphGlobe`
+**Public App Name:** `Font Testing Tool` (Short: `FontAudit`)
 **Owner:** You (Frontend, agency-internal tool)
 **Goal:** Prevent late-stage surprises where a delivered font lacks glyphs for specific languages. Provide a fast, offline-capable PWA to upload one or more font files and test them against real sample content per language, with precise missing-glyph detection and exportable reports.
 
